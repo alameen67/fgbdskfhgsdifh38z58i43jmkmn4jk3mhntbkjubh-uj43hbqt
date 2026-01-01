@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hook Hub Key System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #aa00ff;
+        }
+
+        .header h1 {
+            color: #aa00ff;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(170, 0, 255, 0.5);
+        }
+
+        .header p {
+            color: #bbbbbb;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.98);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: rgba(26, 26, 26, 0.95);
+            padding: 50px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .login-box h2 {
+            color: #aa00ff;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(15, 15, 15, 0.9);
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #aa00ff;
+            box-shadow: 0 0 0 3px rgba(170, 0, 255, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #aa00ff 0%, #8000ff 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(170, 0, 255, 0.4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid #333;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            color: #aa00ff;
+            margin-bottom: 25px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #cccccc;
+            font-weight: 500;
+            font-size: 0.95em;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #aa00ff;
+            box-shadow: 0 0 0 3px rgba(170, 0, 255, 0.15);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00cc66 0%, #00aa55 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff3366 0%, #cc2255 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9900 0%, #cc7700 100%);
+        }
+
+        .key-list-container {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            background: rgba(20, 20, 20, 0.5);
+            padding: 15px;
+        }
+
+        .key-item {
+            background: rgba(40, 40, 40, 0.6);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #aa00ff;
+            transition: all 0.3s ease;
+        }
+
+        .key-item:hover {
+            background: rgba(50, 50, 50, 0.8);
+            transform: translateX(5px);
+        }
+
+        .key-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .key-code {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: #aa00ff;
+            font-weight: bold;
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+
+        .key-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+            font-size: 0.92em;
+            color: #aaaaaa;
+        }
+
+        .key-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active { background: rgba(0, 255, 100, 0.15); color: #00ff66; }
+        .status-paused { background: rgba(255, 165, 0, 0.15); color: #ffaa00; }
+        .status-expired { background: rgba(255, 50, 50, 0.15); color: #ff5555; }
+
+        .notification {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            padding: 18px 25px;
+            border-radius: 12px;
+            background: rgba(30, 30, 30, 0.95);
+            border-left: 5px solid #aa00ff;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+            min-width: 350px;
+            max-width: 400px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { border-left-color: #00cc66; }
+        .notification.error { border-left-color: #ff3366; }
+        .notification.warning { border-left-color: #ff9900; }
+
+        .hidden {
+            display: none;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(30, 30, 30, 0.7);
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #aa00ff;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #aaaaaa;
+            margin-top: 5px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(20, 20, 20, 0.5);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #aa00ff, #8000ff);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #bb11ff, #9111ff);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2><i class="fas fa-lock"></i> Hook Hub Admin</h2>
+            <input type="password" id="adminPassword" class="login-input" placeholder="Enter admin password" onkeypress="if(event.key=='Enter') login()">
+            <button onclick="login()" class="btn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <p style="margin-top: 20px; color: #888; font-size: 0.9em;">
+                Default password: hookcreed
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden">
+        <div class="container">
+            <div class="header">
+                <h1><i class="fas fa-key"></i> Hook Hub Key System</h1>
+                <p>Admin Dashboard • Manage keys, HWID resets, and user access</p>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalKeys">0</div>
+                    <div class="stat-label">Total Keys</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="activeKeys">0</div>
+                    <div class="stat-label">Active Keys</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="pausedKeys">0</div>
+                    <div class="stat-label">Paused</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="expiredKeys">0</div>
+                    <div class="stat-label">Expired</div>
+                </div>
+            </div>
+
+            <!-- Action Cards -->
+            <div class="grid">
+                <!-- Generate Key Card -->
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-plus-circle"></i> Generate New Key</h2>
+                    <div class="input-group">
+                        <label><i class="fas fa-clock"></i> Duration</label>
+                        <select id="keyDuration">
+                            <option value="1DAY">1 Day</option>
+                            <option value="1WEEK" selected>1 Week</option>
+                            <option value="1MONTH">1 Month</option>
+                        </select>
+                    </div>
+                    <button onclick="generateKey()" class="btn">
+                        <i class="fas fa-key"></i> Generate License Key
+                    </button>
+                </div>
+
+                <!-- Key Management Card -->
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-tools"></i> Key Management</h2>
+                    <div class="input-group">
+                        <label><i class="fas fa-keyboard"></i> Target Key</label>
+                        <input type="text" id="targetKey" placeholder="Enter key to manage (or click on a key below)">
+                    </div>
+                    <div class="btn-group">
+                        <button onclick="pauseKey()" class="btn btn-secondary">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button onclick="unpauseKey()" class="btn btn-success">
+                            <i class="fas fa-play"></i> Unpause
+                        </button>
+                        <button onclick="resetHWID()" class="btn btn-danger">
+                            <i class="fas fa-sync-alt"></i> Reset HWID
+                        </button>
+                        <button onclick="getKeyInfo()" class="btn btn-warning">
+                            <i class="fas fa-info-circle"></i> Info
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Keys List -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-list"></i> All License Keys</h2>
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <button onclick="loadKeys()" class="btn">
+                        <i class="fas fa-redo"></i> Refresh Keys
+                    </button>
+                    <button onclick="exportKeys()" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Export Keys
+                    </button>
+                </div>
+                <div id="keyList" class="key-list-container">
+                    <!-- Keys will be loaded here -->
+                    <div style="text-align: center; padding: 40px; color: #888;">
+                        <i class="fas fa-key" style="font-size: 3em; margin-bottom: 15px;"></i>
+                        <p>No keys found. Generate your first key above!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Configuration
+        const API_URL = window.location.origin + '/api/keys';
+        let adminPassword = '';
+        let allKeys = {};
+
+        // Utility Functions
+        function showNotification(message, type = 'info', duration = 3000) {
+            const notif = document.getElementById('notification');
+            notif.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}" 
+                       style="font-size: 1.5em; color: ${type === 'success' ? '#00cc66' : type === 'error' ? '#ff3366' : type === 'warning' ? '#ff9900' : '#aa00ff'}"></i>
+                    <div>${message}</div>
+                </div>
+            `;
+            notif.className = `notification ${type}`;
+            notif.classList.add('show');
+            
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, duration);
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Never';
+            const date = new Date(timestamp);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        function formatTimeLeft(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const diff = timestamp - Date.now();
+            if (diff <= 0) return 'Expired';
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            
+            if (days > 0) return `${days}d ${hours}h left`;
+            if (hours > 0) return `${hours}h left`;
+            return '< 1h left';
+        }
+
+        // Login Function
+        function login() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === 'hookcreed') {
+                adminPassword = password;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').classList.remove('hidden');
+                showNotification('Welcome to Hook Hub Admin!', 'success');
+                loadKeys();
+            } else {
+                showNotification('Invalid password!', 'error');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        // API Functions
+        async function makeRequest(action, data = {}) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...data, action, adminPass: adminPassword })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                showNotification(`API Error: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        // Key Operations
+        async function generateKey() {
+            const duration = document.getElementById('keyDuration').value;
+            
+            const result = await makeRequest('generate', { duration });
+            if (result?.success) {
+                const newKey = result.key;
+                showNotification(`Key generated: ${newKey}`, 'success');
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(newKey).then(() => {
+                    showNotification('Key copied to clipboard!', 'success');
+                });
+                
+                // Set as target key
+                document.getElementById('targetKey').value = newKey;
+                
+                // Refresh key list
+                loadKeys();
+            }
+        }
+
+        async function loadKeys() {
+            const result = await makeRequest('getAllKeys');
+            if (result?.success) {
+                allKeys = result.keys;
+                updateStats(result.keys);
+                displayKeys(result.keys);
+            }
+        }
+
+        async function pauseKey() {
+            const key = document.getElementById('targetKey').value.trim();
+            if (!key) {
+                showNotification('Please enter a key first', 'warning');
+                return;
+            }
+            
+            const result = await makeRequest('pause', { targetKey: key });
+            if (result?.success) {
+                showNotification(`Key ${key} has been paused`, 'success');
+                loadKeys();
+            }
+        }
+
+        async function unpauseKey() {
+            const key = document.getElementById('targetKey').value.trim();
+            if (!key) {
+                showNotification('Please enter a key first', 'warning');
+                return;
+            }
+            
+            const result = await makeRequest('unpause', { targetKey: key });
+            if (result?.success) {
+                showNotification(`Key ${key} has been unpaused`, 'success');
+                loadKeys();
+            }
+        }
+
+        async function resetHWID() {
+            const key = document.getElementById('targetKey').value.trim();
+            if (!key) {
+                showNotification('Please enter a key first', 'warning');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to reset HWID for key: ${key}?\nThis will allow a different user to use this key.`)) {
+                return;
+            }
+            
+            const result = await makeRequest('resetHWID', { targetKey: key });
+            if (result?.success) {
+                showNotification(`HWID reset for key ${key}`, 'success');
+                loadKeys();
+            }
+        }
+
+        async function getKeyInfo() {
+            const key = document.getElementById('targetKey').value.trim();
+            if (!key) {
+                showNotification('Please enter a key first', 'warning');
+                return;
+            }
+            
+            const result = await makeRequest('getKeyInfo', { targetKey: key });
+            if (result?.success) {
+                const keyData = result.key;
+                const info = `
+                    Key: ${keyData.key}
+                    Duration: ${keyData.duration}
+                    Created: ${formatDate(keyData.createdAt)}
+                    Expires: ${formatDate(keyData.expiresAt)} (${formatTimeLeft(keyData.expiresAt)})
+                    HWID: ${keyData.hwid || 'Not set'}
+                    Uses: ${keyData.uses}
+                    Status: ${keyData.paused ? 'Paused' : Date.now() > keyData.expiresAt ? 'Expired' : 'Active'}
+                `;
+                alert(info);
+            }
+        }
+
+        function exportKeys() {
+            const exportData = {
+                generated: new Date().toISOString(),
+                total: Object.keys(allKeys).length,
+                keys: allKeys
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `hookhub-keys-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Keys exported successfully!', 'success');
+        }
+
+        // Display Functions
+        function updateStats(keys) {
+            const keyArray = Object.values(keys);
+            const total = keyArray.length;
+            const active = keyArray.filter(k => !k.paused && Date.now() < k.expiresAt).length;
+            const paused = keyArray.filter(k => k.paused).length;
+            const expired = keyArray.filter(k => Date.now() > k.expiresAt).length;
+            
+            document.getElementById('totalKeys').textContent = total;
+            document.getElementById('activeKeys').textContent = active;
+            document.getElementById('pausedKeys').textContent = paused;
+            document.getElementById('expiredKeys').textContent = expired;
+        }
+
+        function displayKeys(keys) {
+            const keyList = document.getElementById('keyList');
+            
+            if (Object.keys(keys).length === 0) {
+                keyList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #888;">
+                        <i class="fas fa-key" style="font-size: 3em; margin-bottom: 15px;"></i>
+                        <p>No keys found. Generate your first key above!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort keys by creation date (newest first)
+            const sortedKeys = Object.values(keys).sort((a, b) => b.createdAt - a.createdAt);
+            
+            keyList.innerHTML = sortedKeys.map(keyData => {
+                const isExpired = Date.now() > keyData.expiresAt;
+                const status = keyData.paused ? 'paused' : isExpired ? 'expired' : 'active';
+                const statusColor = status === 'active' ? '#00ff66' : status === 'paused' ? '#ffaa00' : '#ff5555';
+                
+                return `
+                    <div class="key-item" onclick="setTargetKey('${keyData.key}')">
+                        <div class="key-header">
+                            <div class="key-code">${keyData.key}</div>
+                            <span class="status-badge status-${status}">${status.toUpperCase()}</span>
+                        </div>
+                        <div style="color: #aa00ff; font-weight: bold; margin-bottom: 5px;">
+                            ${keyData.duration} • ${formatTimeLeft(keyData.expiresAt)}
+                        </div>
+                        <div class="key-info">
+                            <div>
+                                <i class="fas fa-user" style="color: #888; margin-right: 8px;"></i>
+                                HWID: ${keyData.hwid ? keyData.hwid.substring(0, 8) + '...' : 'Not set'}
+                            </div>
+                            <div>
+                                <i class="fas fa-calendar" style="color: #888; margin-right: 8px;"></i>
+                                Created: ${formatDate(keyData.createdAt)}
+                            </div>
+                            <div>
+                                <i class="fas fa-clock" style="color: #888; margin-right: 8px;"></i>
+                                Expires: ${formatDate(keyData.expiresAt)}
+                            </div>
+                            <div>
+                                <i class="fas fa-play-circle" style="color: #888; margin-right: 8px;"></i>
+                                Uses: ${keyData.uses}
+                            </div>
+                        </div>
+                        <div class="key-actions">
+                            <button onclick="event.stopPropagation(); setTargetKey('${keyData.key}')" 
+                                    class="btn" style="padding: 8px 15px; font-size: 0.9em;">
+                                <i class="fas fa-edit"></i> Select
+                            </button>
+                            <button onclick="event.stopPropagation(); copyToClipboard('${keyData.key}')" 
+                                    class="btn btn-secondary" style="padding: 8px 15px; font-size: 0.9em;">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setTargetKey(key) {
+            document.getElementById('targetKey').value = key;
+            showNotification(`Selected key: ${key}`, 'success');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Copied to clipboard!', 'success');
+            });
+        }
+
+        // Event Listeners
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        document.getElementById('targetKey').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') getKeyInfo();
+        });
+
+        // Auto-focus password field on load
+        window.onload = function() {
+            document.getElementById('adminPassword').focus();
+        };
+    </script>
+</body>
+</html>
